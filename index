@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette — Planning de service</title>
+<style>
+  :root{
+    /* === Charte Mlezi Maore === */
+    --mlezi:#c8102e;          /* rouge framboise — primaire */
+    --mlezi-dark:#9d0c24;     /* rouge profond */
+    --mlezi-soft:#fbe7ea;     /* rose très clair — fonds */
+    --ink:#1f2933;
+    --ink-soft:#5a6672;
+    --paper:#ffffff;
+    --app:#f1f2f0;
+    --rule:#e2e6ea;
+    --rule-strong:#c4cbd2;
+    --ok:#1f7a4d;
+    --ok-soft:#e4f3ea;
+    --warn:#b8860b;
+    --warn-soft:#fbf3df;
+    --rest:#eef1f4;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:var(--sans);color:var(--ink);background:var(--app);line-height:1.45;-webkit-font-smoothing:antialiased;padding:24px 16px 60px}
+  .demo-tag{max-width:1180px;margin:0 auto 12px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mlezi);font-weight:700}
+  .sheet{max-width:1180px;margin:0 auto;background:var(--paper);border:1px solid var(--rule);border-radius:8px;box-shadow:0 1px 2px rgba(31,41,51,.06),0 10px 34px rgba(31,41,51,.07);overflow:hidden}
+
+  .band{background:var(--ink);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+  .band .left{display:flex;align-items:center;gap:16px}
+  .logo{width:42px;height:42px;border-radius:9px;background:var(--mlezi);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:#fff;font-style:italic;flex:none}
+  .band h1{font-size:18px;font-weight:650;margin:0;letter-spacing:.04em}
+  .band .sub{font-size:12px;color:#b7c2cd;margin-top:2px}
+  .band .cycle{text-align:right;font-size:12px;color:#cdd6df}
+  .band .cycle strong{display:block;color:#fff;font-size:15px;margin-top:2px}
+
+  .controls{display:flex;gap:14px;align-items:center;padding:14px 28px;border-bottom:1px solid var(--rule);flex-wrap:wrap;background:#fafbfc}
+  .seg{display:flex;flex-direction:column;gap:3px}
+  .seg label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);font-weight:600}
+  .seg .val{font-size:13px;font-weight:600;padding:6px 12px;border:1px solid var(--rule-strong);border-radius:6px;background:#fff;min-width:130px}
+  .seg .val.pill{color:var(--mlezi);border-color:var(--mlezi);background:var(--mlezi-soft)}
+  .spacer{flex:1}
+  .navbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--rule-strong);background:#fff;color:var(--ink);padding:7px 12px;border-radius:6px;cursor:pointer}
+
+  .wrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:920px}
+  thead th{background:#f6f7f8;color:var(--ink-soft);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding:10px 8px;border-bottom:2px solid var(--rule-strong);text-align:center}
+  thead th.agent{text-align:left;width:190px;position:sticky;left:0;background:#f6f7f8;z-index:2}
+  thead th.we{color:var(--mlezi)}
+  tbody td{border-bottom:1px solid var(--rule);border-right:1px solid var(--rule);padding:0;height:54px;vertical-align:middle;text-align:center}
+  .agentcell{text-align:left;padding:8px 12px;position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid var(--rule-strong)}
+  .agentcell .nom{font-weight:650;font-size:13px}
+  .agentcell .meta{font-size:10.5px;color:var(--ink-soft);margin-top:1px}
+  .agentcell .regime{display:inline-block;margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:var(--mlezi-soft);color:var(--mlezi-dark)}
+
+  .shift{margin:3px 4px;border-radius:6px;padding:5px 4px;font-size:11px;font-weight:600;line-height:1.25}
+  .shift .h{font-variant-numeric:tabular-nums}
+  .shift .sub{font-size:9.5px;font-weight:500;opacity:.85}
+  .s-work{background:var(--mlezi-soft);color:var(--mlezi-dark)}
+  .s-work2{background:#e7eef6;color:#234b73}
+  .s-rest{background:var(--rest);color:var(--ink-soft)}
+  .s-ca{background:var(--ok-soft);color:var(--ok)}
+  .s-form{background:var(--warn-soft);color:var(--warn)}
+  td.we-cell{background:#fdf6f7}
+
+  .totcell{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;background:#fafbfc}
+  .totcell .lbl{display:block;font-size:9px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+  .totcell.over{color:var(--mlezi)}
+  .totcell.under{color:var(--ink-soft)}
+
+  .footer-strip{display:flex;gap:26px;flex-wrap:wrap;padding:14px 28px;border-top:1px solid var(--rule);background:#fafbfc;font-size:11px;color:var(--ink-soft)}
+  .footer-strip .legend-item{display:inline-flex;align-items:center;gap:6px}
+  .footer-strip i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+  .cycle-bar{padding:16px 28px;border-top:1px solid var(--rule)}
+  .cycle-bar .title{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);font-weight:700;margin-bottom:10px}
+  .weeks{display:flex;gap:4px;align-items:flex-end;height:64px}
+  .wk{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .wk .bar{width:100%;border-radius:4px 4px 0 0;background:var(--mlezi);min-height:4px}
+  .wk.cur .bar{outline:2px solid var(--ink);outline-offset:1px}
+  .wk .n{font-size:9px;color:var(--ink-soft)}
+  .wk .line44{position:relative}
+  .ref-line{position:relative;height:0}
+</style>
+</head>
+<body>
+<div class="demo-tag">Maquette de démonstration — données fictives</div>
+<div class="sheet">
+
+  <div class="band">
+    <div class="left">
+      <div class="logo">M</div>
+      <div>
+        <h1>Planning de service</h1>
+        <div class="sub">Mlezi Maore — secteur Insertion</div>
+      </div>
+    </div>
+    <div class="cycle">
+      Cycle en cours
+      <strong>Cycle 3 · semaine 5 / 12</strong>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="seg"><label>Secteur</label><span class="val">Insertion</span></div>
+    <div class="seg"><label>Établissement</label><span class="val">ACI Pépinière</span></div>
+    <div class="seg"><label>Service</label><span class="val pill">SIAE — Maraîchage</span></div>
+    <div class="spacer"></div>
+    <button class="navbtn">← Semaine préc.</button>
+    <div class="seg"><label>Semaine affichée</label><span class="val">S5 · 02–08 févr. 2026</span></div>
+    <button class="navbtn">Semaine suiv. →</button>
+  </div>
+
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="agent">Agent</th>
+          <th>Lun 02</th><th>Mar 03</th><th>Mer 04</th><th>Jeu 05</th><th>Ven 06</th>
+          <th class="we">Sam 07</th><th class="we">Dim 08</th>
+          <th>Total sem.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="agentcell"><div class="nom">ABDOU Saïd</div><div class="meta">Encadrant technique</div><span class="regime">Cycle 35h</span></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–14:00</span><div class="sub">pause 1h</div></div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="totcell">34<span class="lbl">heures</span></td>
+        </tr>
+        <tr>
+          <td class="agentcell"><div class="nom">M'COLO DIRI A.</div><div class="meta">Salarié ACI</div><span class="regime">Cycle 35h</span></td>
+          <td><div class="shift s-work"><span class="h">9:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-form">Formation</div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="totcell">26<span class="lbl">heures</span></td>
+        </tr>
+        <tr>
+          <td class="agentcell"><div class="nom">SOULAÏMANA F.</div><div class="meta">Salariée ACI</div><span class="regime">Cycle 35h</span></td>
+          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
+          <td class="we-cell"><div class="shift s-work2"><span class="h">8:00–12:00</span><div class="sub">marché</div></div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="totcell over">44<span class="lbl">heures · limite</span></td>
+        </tr>
+        <tr>
+          <td class="agentcell"><div class="nom">BACAR Ousseni</div><div class="meta">Salarié ACI</div><span class="regime">Cycle 35h</span></td>
+          <td><div class="shift s-ca">Congé annuel</div></td>
+          <td><div class="shift s-ca">Congé annuel</div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="totcell under">21<span class="lbl">heures</span></td>
+        </tr>
+        <tr>
+          <td class="agentcell"><div class="nom">RAKOTO Jean</div><div class="meta">Chef de service</div><span class="regime">37h + JRTT</span></td>
+          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
+          <td><div class="shift s-rest">JRTT</div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
+          <td class="totcell">30<span class="lbl">heures</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-strip">
+    <span class="legend-item"><i style="background:var(--mlezi-soft)"></i> Poste travaillé</span>
+    <span class="legend-item"><i style="background:#e7eef6"></i> Poste spécifique / cadre</span>
+    <span class="legend-item"><i style="background:var(--ok-soft)"></i> Congé annuel</span>
+    <span class="legend-item"><i style="background:var(--warn-soft)"></i> Formation</span>
+    <span class="legend-item"><i style="background:var(--rest)"></i> Repos / JRTT</span>
+    <span class="legend-item" style="color:var(--mlezi)"><i style="background:var(--mlezi)"></i> ≥ 44 h : seuil HS de l'accord</span>
+  </div>
+
+  <div class="cycle-bar">
+    <div class="title">Compteur de cycle — 12 semaines (réf. accord 1er juillet 2022) · moyenne cible 35 h/sem</div>
+    <div class="weeks">
+      <div class="wk"><div class="bar" style="height:46%"></div><div class="n">S1</div></div>
+      <div class="wk"><div class="bar" style="height:80%"></div><div class="n">S2</div></div>
+      <div class="wk"><div class="bar" style="height:64%"></div><div class="n">S3</div></div>
+      <div class="wk"><div class="bar" style="height:90%"></div><div class="n">S4</div></div>
+      <div class="wk cur"><div class="bar" style="height:100%"></div><div class="n">S5</div></div>
+      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S6</div></div>
+      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S7</div></div>
+      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S8</div></div>
+      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S9</div></div>
+      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S10</div></div>
+      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S11</div></div>
+      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S12</div></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
