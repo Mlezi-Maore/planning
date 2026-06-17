@@ -3,30 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Maquette — Planning de service</title>
+<title>Maquette cliquable — Planning de service</title>
 <style>
   :root{
-    /* === Charte Mlezi Maore === */
-    --mlezi:#c8102e;          /* rouge framboise — primaire */
-    --mlezi-dark:#9d0c24;     /* rouge profond */
-    --mlezi-soft:#fbe7ea;     /* rose très clair — fonds */
-    --ink:#1f2933;
-    --ink-soft:#5a6672;
-    --paper:#ffffff;
-    --app:#f1f2f0;
-    --rule:#e2e6ea;
-    --rule-strong:#c4cbd2;
-    --ok:#1f7a4d;
-    --ok-soft:#e4f3ea;
-    --warn:#b8860b;
-    --warn-soft:#fbf3df;
-    --rest:#eef1f4;
+    --mlezi:#c8102e;--mlezi-dark:#9d0c24;--mlezi-soft:#fbe7ea;
+    --ink:#1f2933;--ink-soft:#5a6672;--paper:#ffffff;--app:#f1f2f0;
+    --rule:#e2e6ea;--rule-strong:#c4cbd2;--ok:#1f7a4d;--ok-soft:#e4f3ea;
+    --warn:#b8860b;--warn-soft:#fbf3df;--rest:#eef1f4;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
-  *{box-sizing:border-box}
-  html,body{margin:0}
+  *{box-sizing:border-box}html,body{margin:0}
   body{font-family:var(--sans);color:var(--ink);background:var(--app);line-height:1.45;-webkit-font-smoothing:antialiased;padding:24px 16px 60px}
   .demo-tag{max-width:1180px;margin:0 auto 12px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mlezi);font-weight:700}
+  .demo-tag span{color:var(--ink-soft);font-weight:600;letter-spacing:.02em;text-transform:none}
   .sheet{max-width:1180px;margin:0 auto;background:var(--paper);border:1px solid var(--rule);border-radius:8px;box-shadow:0 1px 2px rgba(31,41,51,.06),0 10px 34px rgba(31,41,51,.07);overflow:hidden}
 
   .band{background:var(--ink);color:#fff;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
@@ -44,19 +33,24 @@
   .seg .val.pill{color:var(--mlezi);border-color:var(--mlezi);background:var(--mlezi-soft)}
   .spacer{flex:1}
   .navbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--rule-strong);background:#fff;color:var(--ink);padding:7px 12px;border-radius:6px;cursor:pointer}
+  .navbtn:hover{border-color:var(--mlezi);color:var(--mlezi)}
+  .navbtn:active{transform:translateY(1px)}
 
   .wrap{overflow-x:auto}
   table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:920px}
   thead th{background:#f6f7f8;color:var(--ink-soft);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding:10px 8px;border-bottom:2px solid var(--rule-strong);text-align:center}
   thead th.agent{text-align:left;width:190px;position:sticky;left:0;background:#f6f7f8;z-index:2}
   thead th.we{color:var(--mlezi)}
-  tbody td{border-bottom:1px solid var(--rule);border-right:1px solid var(--rule);padding:0;height:54px;vertical-align:middle;text-align:center}
+  tbody td{border-bottom:1px solid var(--rule);border-right:1px solid var(--rule);padding:0;height:56px;vertical-align:middle;text-align:center}
+  td.slot{cursor:pointer;position:relative;transition:background .12s}
+  td.slot:hover{background:#fff6f7;box-shadow:inset 0 0 0 2px var(--mlezi-soft)}
+  td.we-cell{background:#fdf6f7}
   .agentcell{text-align:left;padding:8px 12px;position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid var(--rule-strong)}
   .agentcell .nom{font-weight:650;font-size:13px}
   .agentcell .meta{font-size:10.5px;color:var(--ink-soft);margin-top:1px}
   .agentcell .regime{display:inline-block;margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:var(--mlezi-soft);color:var(--mlezi-dark)}
 
-  .shift{margin:3px 4px;border-radius:6px;padding:5px 4px;font-size:11px;font-weight:600;line-height:1.25}
+  .shift{margin:3px 4px;border-radius:6px;padding:5px 4px;font-size:11px;font-weight:600;line-height:1.25;pointer-events:none}
   .shift .h{font-variant-numeric:tabular-nums}
   .shift .sub{font-size:9.5px;font-weight:500;opacity:.85}
   .s-work{background:var(--mlezi-soft);color:var(--mlezi-dark)}
@@ -64,124 +58,179 @@
   .s-rest{background:var(--rest);color:var(--ink-soft)}
   .s-ca{background:var(--ok-soft);color:var(--ok)}
   .s-form{background:var(--warn-soft);color:var(--warn)}
-  td.we-cell{background:#fdf6f7}
+  .empty-hint{color:#c4cbd2;font-size:18px;font-weight:300;pointer-events:none}
 
   .totcell{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;background:#fafbfc}
   .totcell .lbl{display:block;font-size:9px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
   .totcell.over{color:var(--mlezi)}
   .totcell.under{color:var(--ink-soft)}
 
-  .footer-strip{display:flex;gap:26px;flex-wrap:wrap;padding:14px 28px;border-top:1px solid var(--rule);background:#fafbfc;font-size:11px;color:var(--ink-soft)}
+  /* alertes accord */
+  .alerts{padding:12px 28px;border-top:1px solid var(--rule);background:var(--warn-soft);font-size:12.5px}
+  .alerts.clean{background:var(--ok-soft)}
+  .alerts .head{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--warn)}
+  .alerts.clean .head{color:var(--ok)}
+  .alerts .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+  .alerts ul{margin:6px 0 0;padding-left:24px;color:var(--ink)}
+  .alerts li{margin:2px 0}
+  .alerts li b{color:var(--mlezi-dark)}
+
+  .footer-strip{display:flex;gap:22px;flex-wrap:wrap;padding:14px 28px;border-top:1px solid var(--rule);background:#fafbfc;font-size:11px;color:var(--ink-soft)}
   .footer-strip .legend-item{display:inline-flex;align-items:center;gap:6px}
   .footer-strip i{width:12px;height:12px;border-radius:3px;display:inline-block}
 
   .cycle-bar{padding:16px 28px;border-top:1px solid var(--rule)}
   .cycle-bar .title{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);font-weight:700;margin-bottom:10px}
-  .weeks{display:flex;gap:4px;align-items:flex-end;height:64px}
-  .wk{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-  .wk .bar{width:100%;border-radius:4px 4px 0 0;background:var(--mlezi);min-height:4px}
+  .weeks{display:flex;gap:4px;align-items:flex-end;height:74px}
+  .wk{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+  .wk .barwrap{width:100%;height:54px;display:flex;align-items:flex-end;position:relative}
+  .wk .bar{width:100%;border-radius:4px 4px 0 0;background:var(--mlezi);min-height:3px;transition:height .2s}
   .wk.cur .bar{outline:2px solid var(--ink);outline-offset:1px}
+  .wk.future .bar{background:var(--rule-strong)}
   .wk .n{font-size:9px;color:var(--ink-soft)}
-  .wk .line44{position:relative}
-  .ref-line{position:relative;height:0}
+  .wk:hover .n{color:var(--mlezi);font-weight:700}
+  .ref35{position:absolute;left:0;right:0;border-top:1px dashed var(--ink-soft);opacity:.5}
+
+  /* éditeur de créneau (modal) */
+  .overlay{position:fixed;inset:0;background:rgba(31,41,51,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+  .overlay.show{display:flex}
+  .modal{background:#fff;border-radius:12px;width:380px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+  .modal .mhead{background:var(--ink);color:#fff;padding:16px 20px}
+  .modal .mhead .who{font-weight:700;font-size:15px}
+  .modal .mhead .when{font-size:12px;color:#b7c2cd;margin-top:2px}
+  .modal .mbody{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+  .mfield{display:flex;flex-direction:column;gap:5px}
+  .mfield label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+  .mfield select,.mfield input{font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--rule-strong);border-radius:7px;background:#fff}
+  .mfield select:focus,.mfield input:focus{outline:2px solid var(--mlezi);outline-offset:-1px;border-color:var(--mlezi)}
+  .mrow{display:flex;gap:12px}.mrow .mfield{flex:1}
+  .mhint{font-size:11.5px;color:var(--ink-soft);background:var(--app);border-radius:7px;padding:8px 10px}
+  .mfoot{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--rule);background:#fafbfc}
+  .mbtn{font:inherit;font-size:13px;font-weight:600;padding:9px 16px;border-radius:7px;cursor:pointer;border:1px solid var(--rule-strong);background:#fff;color:var(--ink)}
+  .mbtn.primary{background:var(--mlezi);color:#fff;border-color:var(--mlezi)}
+  .mbtn.danger{color:var(--mlezi);border-color:transparent;margin-right:auto}
+  .mbtn:hover{filter:brightness(.97)}
+  .timeflds{display:flex;gap:12px}
+
+
+  /* ===== Habillage Mlezi Maore — aligné avec le modèle Word fourni ===== */
+  :root{
+    --mlezi:#d9483f;
+    --mlezi-red:#d71920;
+    --mlezi-dark:#2a2a2a;
+    --mlezi-soft:#fff0ee;
+    --mlezi-line:#f07a5d;
+    --ink:#161616;
+    --ink-soft:#666666;
+    --paper:#ffffff;
+    --app:#f4f4f2;
+    --rule:#e9dedb;
+    --rule-strong:#e6b4a8;
+  }
+  body{background:var(--app);padding:28px 18px 60px}
+  .demo-tag{max-width:1120px;color:var(--mlezi);letter-spacing:.14em}
+  .demo-tag span{color:#555}
+  .sheet{max-width:1120px;border:0;border-radius:2px;box-shadow:0 10px 36px rgba(0,0,0,.08);overflow:hidden}
+  .brand-header{padding:34px 54px 24px;background:#fff}
+  .brand-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+  .brand-logo{width:132px;height:auto;object-fit:contain;display:block}
+  .brand-meta{text-align:right;font-size:11px;line-height:1.25;color:#333;max-width:290px;margin-top:4px}
+  .brand-meta strong{display:block;font-weight:800}
+  .brand-meta span{display:block;color:#555}
+  .title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-top:34px;padding-bottom:14px;border-bottom:3px solid var(--mlezi-line)}
+  .title-row h1{margin:0;color:var(--mlezi);font-size:28px;line-height:1;text-transform:uppercase;letter-spacing:.02em;font-weight:800}
+  .title-row p{margin:8px 0 0;color:var(--ink-soft);font-size:13px}
+  .cycle-card{text-align:right;border-left:4px solid var(--mlezi-line);padding-left:14px;min-width:220px}
+  .cycle-card span{display:block;color:var(--ink-soft);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+  .cycle-card strong{display:block;color:var(--ink);font-size:15px;margin-top:4px}
+  .controls{background:#fff7f5;border-bottom:1px solid var(--rule);padding:16px 54px}
+  .seg label,.cycle-bar .title{color:#686868}
+  .seg .val{border-color:#ead5d0;border-radius:3px}
+  .seg .val.pill{color:var(--mlezi-red);border-color:var(--mlezi-line);background:#fff}
+  .navbtn{border-color:#ead5d0;border-radius:3px}
+  .navbtn:hover{border-color:var(--mlezi);color:var(--mlezi)}
+  .wrap{padding:0 54px;background:#fff}
+  table{min-width:920px}
+  thead th{background:#fff7f5;color:#666;border-bottom:2px solid var(--mlezi-line)}
+  thead th.agent{background:#fff7f5}
+  tbody td{border-color:#eee0dc}
+  .agentcell{background:#fff;border-right:2px solid #ead5d0}
+  .agentcell .regime{border-radius:2px;background:#fff0ee;color:var(--mlezi-red)}
+  .shift{border-radius:3px}
+  .s-work{background:#fff0ee;color:#9b171c;border-left:3px solid var(--mlezi-red)}
+  .s-work2{background:#f3f5f7;color:#333;border-left:3px solid #8a8a8a}
+  .s-ca{background:#eef7f1;color:#1f7a4d;border-left:3px solid #1f7a4d}
+  .s-form{background:#fff6df;color:#956500;border-left:3px solid #d6a000}
+  .s-rest{background:#f1f1f1;color:#777;border-left:3px solid #c7c7c7}
+  .alerts{margin:0 54px;border-top:1px solid var(--rule);background:#fff6df}
+  .alerts.clean{background:#eef7f1}
+  .footer-strip,.cycle-bar{padding-left:54px;padding-right:54px;background:#fff}
+  .footer-strip{border-top:1px solid var(--rule)}
+  .wk .bar{background:var(--mlezi-red);border-radius:2px 2px 0 0}
+  .wk.cur .bar{outline:2px solid #222}
+  .modal .mhead{background:#222}
+  .mbtn.primary{background:var(--mlezi-red);border-color:var(--mlezi-red)}
+  .brand-footer{display:flex;gap:16px;align-items:flex-start;margin:34px 54px 26px;padding-top:10px;color:#1f1f1f;font-size:12px;line-height:1.35}
+  .brand-footer .footer-rule{width:8px;height:56px;background:var(--mlezi-line);flex:0 0 8px}
+  .brand-footer strong{font-weight:800}
+  .brand-footer span{color:var(--mlezi)}
+  @media (max-width:760px){
+    .brand-header,.controls,.wrap,.footer-strip,.cycle-bar{padding-left:22px;padding-right:22px}
+    .brand-top,.title-row{display:block}
+    .brand-meta{text-align:left;margin-top:14px}
+    .cycle-card{text-align:left;margin-top:16px}
+    .title-row h1{font-size:23px}
+    .brand-footer{margin-left:22px;margin-right:22px}
+  }
+
 </style>
 </head>
 <body>
-<div class="demo-tag">Maquette de démonstration — données fictives</div>
+<div class="demo-tag">Prototype GitHub — <span>planning de service Mlezi Maore · cliquez une case pour éditer un créneau</span></div>
 <div class="sheet">
 
-  <div class="band">
-    <div class="left">
-      <div class="logo">M</div>
-      <div>
-        <h1>Planning de service</h1>
-        <div class="sub">Mlezi Maore — secteur Insertion</div>
+  <header class="brand-header" aria-label="En-tête Mlezi Maore">
+    <div class="brand-top">
+      <img class="brand-logo" src="assets/logo-mlezi-maore.jpg" alt="Mlezi Maore — Groupe SOS">
+      <div class="brand-meta">
+        <strong>Mlezi Maore une association du GROUPE SOS</strong>
+        <span>3, rue Leclerc · 97600 Mamoudzou</span>
       </div>
     </div>
-    <div class="cycle">
-      Cycle en cours
-      <strong>Cycle 3 · semaine 5 / 12</strong>
+    <div class="title-row">
+      <div>
+        <h1>Planning de service</h1>
+        <p>Maquette cliquable · secteur Insertion · données fictives non sauvegardées</p>
+      </div>
+      <div class="cycle-card">
+        <span>Cycle en cours</span>
+        <strong id="cycleLabel">Cycle 3 · semaine 5 / 12</strong>
+      </div>
     </div>
-  </div>
+  </header>
 
   <div class="controls">
     <div class="seg"><label>Secteur</label><span class="val">Insertion</span></div>
     <div class="seg"><label>Établissement</label><span class="val">ACI Pépinière</span></div>
     <div class="seg"><label>Service</label><span class="val pill">SIAE — Maraîchage</span></div>
     <div class="spacer"></div>
-    <button class="navbtn">← Semaine préc.</button>
-    <div class="seg"><label>Semaine affichée</label><span class="val">S5 · 02–08 févr. 2026</span></div>
-    <button class="navbtn">Semaine suiv. →</button>
+    <button class="navbtn" id="prevWk">← Semaine préc.</button>
+    <div class="seg"><label>Semaine affichée</label><span class="val" id="weekLabel">S5 · 02–08 févr. 2026</span></div>
+    <button class="navbtn" id="nextWk">Semaine suiv. →</button>
   </div>
 
   <div class="wrap">
     <table>
       <thead>
-        <tr>
-          <th class="agent">Agent</th>
-          <th>Lun 02</th><th>Mar 03</th><th>Mer 04</th><th>Jeu 05</th><th>Ven 06</th>
-          <th class="we">Sam 07</th><th class="we">Dim 08</th>
-          <th>Total sem.</th>
-        </tr>
+        <tr id="headRow"></tr>
       </thead>
-      <tbody>
-        <tr>
-          <td class="agentcell"><div class="nom">ABDOU Saïd</div><div class="meta">Encadrant technique</div><span class="regime">Cycle 35h</span></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–14:00</span><div class="sub">pause 1h</div></div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="totcell">34<span class="lbl">heures</span></td>
-        </tr>
-        <tr>
-          <td class="agentcell"><div class="nom">M'COLO DIRI A.</div><div class="meta">Salarié ACI</div><span class="regime">Cycle 35h</span></td>
-          <td><div class="shift s-work"><span class="h">9:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-form">Formation</div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="totcell">26<span class="lbl">heures</span></td>
-        </tr>
-        <tr>
-          <td class="agentcell"><div class="nom">SOULAÏMANA F.</div><div class="meta">Salariée ACI</div><span class="regime">Cycle 35h</span></td>
-          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–16:00</span><div class="sub">pause 1h</div></div></td>
-          <td class="we-cell"><div class="shift s-work2"><span class="h">8:00–12:00</span><div class="sub">marché</div></div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="totcell over">44<span class="lbl">heures · limite</span></td>
-        </tr>
-        <tr>
-          <td class="agentcell"><div class="nom">BACAR Ousseni</div><div class="meta">Salarié ACI</div><span class="regime">Cycle 35h</span></td>
-          <td><div class="shift s-ca">Congé annuel</div></td>
-          <td><div class="shift s-ca">Congé annuel</div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work"><span class="h">7:00–15:00</span><div class="sub">pause 1h</div></div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="totcell under">21<span class="lbl">heures</span></td>
-        </tr>
-        <tr>
-          <td class="agentcell"><div class="nom">RAKOTO Jean</div><div class="meta">Chef de service</div><span class="regime">37h + JRTT</span></td>
-          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-work2"><span class="h">8:00–16:30</span><div class="sub">pause 1h</div></div></td>
-          <td><div class="shift s-rest">JRTT</div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="we-cell"><div class="shift s-rest">Repos</div></td>
-          <td class="totcell">30<span class="lbl">heures</span></td>
-        </tr>
-      </tbody>
+      <tbody id="grid"></tbody>
     </table>
+  </div>
+
+  <div class="alerts clean" id="alerts">
+    <div class="head"><span class="dot"></span><span id="alertHead">Aucune alerte sur la semaine affichée.</span></div>
+    <ul id="alertList"></ul>
   </div>
 
   <div class="footer-strip">
@@ -194,23 +243,347 @@
   </div>
 
   <div class="cycle-bar">
-    <div class="title">Compteur de cycle — 12 semaines (réf. accord 1er juillet 2022) · moyenne cible 35 h/sem</div>
-    <div class="weeks">
-      <div class="wk"><div class="bar" style="height:46%"></div><div class="n">S1</div></div>
-      <div class="wk"><div class="bar" style="height:80%"></div><div class="n">S2</div></div>
-      <div class="wk"><div class="bar" style="height:64%"></div><div class="n">S3</div></div>
-      <div class="wk"><div class="bar" style="height:90%"></div><div class="n">S4</div></div>
-      <div class="wk cur"><div class="bar" style="height:100%"></div><div class="n">S5</div></div>
-      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S6</div></div>
-      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S7</div></div>
-      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S8</div></div>
-      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S9</div></div>
-      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S10</div></div>
-      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S11</div></div>
-      <div class="wk"><div class="bar" style="height:30%;background:var(--rule-strong)"></div><div class="n">S12</div></div>
-    </div>
+    <div class="title">Compteur de cycle — 12 semaines (réf. accord 1er juillet 2022) · moyenne cible 35 h/sem · <span id="cycleAvg"></span></div>
+    <div class="weeks" id="cycleWeeks"></div>
   </div>
 
+
+  <footer class="brand-footer">
+    <div class="footer-rule"></div>
+    <div>
+      <strong>Mlezi Maore une association du GROUPE SOS</strong><br>
+      3, rue Leclerc · 97600 Mamoudzou<br>
+      Tél. : 02 69 61 64 00 · <span>secretariat@mlezi-maore.com</span><br>
+      <strong>www.mlezi-maore.com</strong>
+    </div>
+  </footer>
+
 </div>
+
+<!-- éditeur de créneau -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mhead">
+      <div class="who" id="mWho">—</div>
+      <div class="when" id="mWhen">—</div>
+    </div>
+    <div class="mbody">
+      <div class="mfield">
+        <label>Type de créneau</label>
+        <select id="mType">
+          <option value="work">Poste travaillé</option>
+          <option value="work2">Poste spécifique / marché</option>
+          <option value="rest">Repos</option>
+          <option value="ca">Congé annuel</option>
+          <option value="form">Formation</option>
+          <option value="jrtt">JRTT</option>
+        </select>
+      </div>
+      <div id="timeBlock">
+        <div class="mrow">
+          <div class="mfield"><label>Prise de poste</label><input type="time" id="mStart" value="07:00"></div>
+          <div class="mfield"><label>Fin de poste</label><input type="time" id="mEnd" value="15:00"></div>
+        </div>
+        <div class="mrow" style="margin-top:12px">
+          <div class="mfield"><label>Pause (h)</label><input type="number" id="mPause" value="1" step="0.25" min="0"></div>
+          <div class="mfield"><label>Total calculé</label><input type="text" id="mTotal" value="" readonly></div>
+        </div>
+      </div>
+      <div class="mhint" id="mHint"></div>
+    </div>
+    <div class="mfoot">
+      <button class="mbtn danger" id="mClear">Vider</button>
+      <button class="mbtn" id="mCancel">Annuler</button>
+      <button class="mbtn primary" id="mSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+// ----- Données fictives -----
+const AGENTS = [
+  {id:"a1", nom:"ABDOU Saïd",      meta:"Encadrant technique", regime:"Cycle 35h"},
+  {id:"a2", nom:"M'COLO DIRI A.",  meta:"Salarié ACI",         regime:"Cycle 35h"},
+  {id:"a3", nom:"SOULAÏMANA F.",   meta:"Salariée ACI",        regime:"Cycle 35h"},
+  {id:"a4", nom:"BACAR Ousseni",   meta:"Salarié ACI",         regime:"Cycle 35h"},
+  {id:"a5", nom:"RAKOTO Jean",     meta:"Chef de service",     regime:"37h + JRTT"},
+];
+const DAYS = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+const TYPES = {
+  work:{cls:"s-work", label:"Travaillé"},
+  work2:{cls:"s-work2", label:"Spécifique"},
+  rest:{cls:"s-rest", label:"Repos"},
+  ca:{cls:"s-ca", label:"Congé annuel"},
+  form:{cls:"s-form", label:"Formation"},
+  jrtt:{cls:"s-rest", label:"JRTT"},
+};
+const TIMED = new Set(["work","work2"]);
+
+// seuils accord (paramétrables)
+const RULES = { weekMax:44, dayMax:10, dayHard:12, restDaily:11, maxDays:6, weekRef:35 };
+
+// 12 semaines : on pré-remplit S5 (affichée) + des totaux fictifs pour les autres
+const WEEK_DATES = ["29 déc","05 jan","12 jan","19 jan","26 jan","02 févr","09 févr","16 févr","23 févr","02 mars","09 mars","16 mars"];
+const MONTHS = ["déc.","janv.","janv.","janv.","janv.","févr.","févr.","févr.","févr.","mars","mars","mars"];
+let curWeek = 4; // index 0..11 → S5
+const CUR_EDITABLE = 4; // la semaine réellement éditée dans la démo
+
+// état : data[week][agentId][dayIndex] = {type,start,end,pause}
+const data = {};
+function blank(){return null;}
+for(let w=0;w<12;w++){ data[w]={}; AGENTS.forEach(a=>{ data[w][a.id]=[null,null,null,null,null,null,null]; }); }
+
+// pré-remplissage de la semaine 5 (cohérent avec la maquette image)
+function set(w,aid,d,o){ data[w][aid][d]=o; }
+const W=CUR_EDITABLE;
+["a1"].forEach(()=>{});
+set(W,"a1",0,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a1",1,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a1",2,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a1",3,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a1",4,{type:"work",start:"07:00",end:"14:00",pause:1});
+set(W,"a1",5,{type:"rest"}); set(W,"a1",6,{type:"rest"});
+
+set(W,"a2",0,{type:"work",start:"09:00",end:"15:00",pause:1});
+set(W,"a2",1,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a2",2,{type:"form"});
+set(W,"a2",3,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a2",4,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a2",5,{type:"rest"}); set(W,"a2",6,{type:"rest"});
+
+set(W,"a3",0,{type:"work",start:"07:00",end:"16:00",pause:1});
+set(W,"a3",1,{type:"work",start:"07:00",end:"16:00",pause:1});
+set(W,"a3",2,{type:"work",start:"07:00",end:"16:00",pause:1});
+set(W,"a3",3,{type:"work",start:"07:00",end:"16:00",pause:1});
+set(W,"a3",4,{type:"work",start:"07:00",end:"16:00",pause:1});
+set(W,"a3",5,{type:"work2",start:"08:00",end:"12:00",pause:0});
+set(W,"a3",6,{type:"rest"});
+
+set(W,"a4",0,{type:"ca"}); set(W,"a4",1,{type:"ca"});
+set(W,"a4",2,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a4",3,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a4",4,{type:"work",start:"07:00",end:"15:00",pause:1});
+set(W,"a4",5,{type:"rest"}); set(W,"a4",6,{type:"rest"});
+
+set(W,"a5",0,{type:"work2",start:"08:00",end:"16:30",pause:1});
+set(W,"a5",1,{type:"work2",start:"08:00",end:"16:30",pause:1});
+set(W,"a5",2,{type:"work2",start:"08:00",end:"16:30",pause:1});
+set(W,"a5",3,{type:"work2",start:"08:00",end:"16:30",pause:1});
+set(W,"a5",4,{type:"jrtt"}); set(W,"a5",5,{type:"rest"}); set(W,"a5",6,{type:"rest"});
+
+// totaux fictifs pour les autres semaines (pour donner vie au compteur de cycle)
+const FAKE_WEEK_TOTALS = [16,28,23,32,0,30,30,30,30,30,30,30]; // moyenne par semaine toutes confondues (illustratif)
+
+// ----- Utilitaires -----
+const $ = id => document.getElementById(id);
+function toMin(t){ if(!t) return null; const [h,m]=t.split(":").map(Number); return h*60+m; }
+function slotHours(o){
+  if(!o || !TIMED.has(o.type)) return 0;
+  const s=toMin(o.start), e=toMin(o.end);
+  if(s==null||e==null||e<=s) return 0;
+  return (e-s)/60 - (Number(o.pause)||0);
+}
+function fmt(n){ return (Math.round(n*100)/100).toLocaleString("fr-FR"); }
+function agentWeekHours(aid,w){
+  return data[w][aid].reduce((t,o)=>t+slotHours(o),0);
+}
+
+// ----- Rendu en-tête -----
+function renderHead(){
+  const wd = weekDatesFor(curWeek);
+  let html = '<th class="agent">Agent</th>';
+  DAYS.forEach((d,i)=>{
+    const we = i>=5 ? ' we':'';
+    html += `<th class="${we?'we':''}">${d} ${wd[i]}</th>`;
+  });
+  html += '<th>Total sem.</th>';
+  $("headRow").innerHTML = html;
+}
+// jours affichés par semaine (lun→dim), cohérents sur les 12 semaines de démo
+const WEEK_DAYNUMS = [
+  [29,30,31,1,2,3,4],     // S1 (29 déc → 4 jan)
+  [5,6,7,8,9,10,11],      // S2
+  [12,13,14,15,16,17,18], // S3
+  [19,20,21,22,23,24,25], // S4
+  [26,27,28,29,30,31,1],  // S5 (26 jan → 1 févr) — éditée
+  [2,3,4,5,6,7,8],        // S6
+  [9,10,11,12,13,14,15],  // S7
+  [16,17,18,19,20,21,22], // S8
+  [23,24,25,26,27,28,1],  // S9
+  [2,3,4,5,6,7,8],        // S10
+  [9,10,11,12,13,14,15],  // S11
+  [16,17,18,19,20,21,22], // S12
+];
+function weekDatesFor(w){ return WEEK_DAYNUMS[w]; }
+
+// ----- Rendu grille -----
+function renderGrid(){
+  const tbody = $("grid"); tbody.innerHTML="";
+  AGENTS.forEach(a=>{
+    const tr = document.createElement("tr");
+    let cells = `<td class="agentcell"><div class="nom">${a.nom}</div><div class="meta">${a.meta}</div><span class="regime">${a.regime}</span></td>`;
+    for(let d=0; d<7; d++){
+      const o = data[curWeek][a.id][d];
+      const we = d>=5 ? ' we-cell':'';
+      cells += `<td class="slot${we}" data-a="${a.id}" data-d="${d}">${slotHTML(o)}</td>`;
+    }
+    const h = agentWeekHours(a.id, curWeek);
+    const over = h>=RULES.weekMax;
+    const cls = over ? ' over' : (h>0 && h<RULES.weekRef ? ' under':'');
+    const lbl = over ? 'heures · limite' : 'heures';
+    cells += `<td class="totcell${cls}">${fmt(h)}<span class="lbl">${lbl}</span></td>`;
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+  bindCells();
+}
+function slotHTML(o){
+  if(!o) return '<span class="empty-hint">+</span>';
+  const t = TYPES[o.type];
+  if(TIMED.has(o.type)){
+    return `<div class="shift ${t.cls}"><span class="h">${o.start}–${o.end}</span><div class="sub">pause ${fmt(o.pause||0)}h</div></div>`;
+  }
+  return `<div class="shift ${t.cls}">${t.label}</div>`;
+}
+function bindCells(){
+  document.querySelectorAll("td.slot").forEach(td=>{
+    td.addEventListener("click", ()=>openEditor(td.dataset.a, +td.dataset.d));
+  });
+}
+
+// ----- Alertes accord (sur la semaine affichée) -----
+function renderAlerts(){
+  const issues=[];
+  AGENTS.forEach(a=>{
+    const week = data[curWeek][a.id];
+    // total hebdo > 44h
+    const h = agentWeekHours(a.id,curWeek);
+    if(h>RULES.weekMax) issues.push(`<b>${a.nom}</b> : ${fmt(h)} h cette semaine — dépasse le plafond de ${RULES.weekMax} h (déclenche des HS).`);
+    // > 6 jours travaillés
+    const worked = week.filter(o=>o && TIMED.has(o.type)).length;
+    if(worked>RULES.maxDays) issues.push(`<b>${a.nom}</b> : ${worked} jours travaillés — l'accord limite à ${RULES.maxDays} jours/semaine.`);
+    // amplitude quotidienne
+    week.forEach((o,d)=>{
+      const dh = slotHours(o);
+      if(dh>RULES.dayHard) issues.push(`<b>${a.nom}</b>, ${DAYS[d]} : ${fmt(dh)} h — au-delà du maximum absolu de ${RULES.dayHard} h.`);
+      else if(dh>RULES.dayMax) issues.push(`<b>${a.nom}</b>, ${DAYS[d]} : ${fmt(dh)} h — au-delà de ${RULES.dayMax} h (exceptionnel, accord art. 1-8).`);
+    });
+    // repos quotidien < 11h entre deux jours consécutifs travaillés
+    for(let d=0; d<6; d++){
+      const o1=week[d], o2=week[d+1];
+      if(o1&&o2&&TIMED.has(o1.type)&&TIMED.has(o2.type)){
+        const end1=toMin(o1.end), start2=toMin(o2.start);
+        if(end1!=null&&start2!=null){
+          const rest=(24*60-end1)+start2;
+          if(rest < RULES.restDaily*60) issues.push(`<b>${a.nom}</b> : repos de ${fmt(rest/60)} h entre ${DAYS[d]} et ${DAYS[d+1]} — sous le minimum de ${RULES.restDaily} h.`);
+        }
+      }
+    }
+  });
+  const box=$("alerts");
+  if(issues.length===0){
+    box.className="alerts clean";
+    $("alertHead").textContent="Conforme — aucune alerte sur la semaine affichée.";
+    $("alertList").innerHTML="";
+  }else{
+    box.className="alerts";
+    $("alertHead").textContent=`${issues.length} point(s) à vérifier — règles de l'accord d'entreprise`;
+    $("alertList").innerHTML=issues.map(i=>`<li>${i}</li>`).join("");
+  }
+}
+
+// ----- Compteur de cycle -----
+function renderCycle(){
+  const wrap=$("cycleWeeks"); wrap.innerHTML="";
+  // total par semaine : réel pour les semaines éditées, fictif sinon
+  const totals=[];
+  for(let w=0; w<12; w++){
+    let any=false;
+    AGENTS.forEach(a=>{ data[w][a.id].forEach(o=>{ if(o) any=true; }); });
+    totals.push(any ? AGENTS.reduce((t,a)=>t+agentWeekHours(a.id,w),0)/AGENTS.length : FAKE_WEEK_TOTALS[w]);
+  }
+  const maxv=Math.max(48, ...totals);
+  totals.forEach((v,w)=>{
+    const pct=Math.max(4, v/maxv*100);
+    const future = w>curWeek;
+    const cur = w===curWeek;
+    const div=document.createElement("div");
+    div.className="wk"+(cur?" cur":"")+(future?" future":"");
+    div.innerHTML=`<div class="barwrap"><div class="ref35" style="bottom:${RULES.weekRef/maxv*100}%"></div><div class="bar" style="height:${pct}%"></div></div><div class="n">S${w+1}</div>`;
+    div.addEventListener("click",()=>{ curWeek=w; renderAll(); });
+    wrap.appendChild(div);
+  });
+  const avg = totals.slice(0,curWeek+1).reduce((a,b)=>a+b,0)/(curWeek+1);
+  $("cycleAvg").textContent = `moyenne à date ≈ ${fmt(avg)} h/sem (illustratif)`;
+}
+
+// ----- Navigation -----
+function renderLabels(){
+  const wd=weekDatesFor(curWeek);
+  const mois = MONTHS[curWeek];
+  $("weekLabel").textContent = `S${curWeek+1} · ${wd[0]}–${wd[6]} ${mois} 2026`;
+  $("cycleLabel").textContent = `Cycle 3 · semaine ${curWeek+1} / 12`;
+}
+function renderAll(){ renderHead(); renderGrid(); renderAlerts(); renderCycle(); renderLabels(); }
+
+$("prevWk").addEventListener("click",()=>{ if(curWeek>0){curWeek--; renderAll();} });
+$("nextWk").addEventListener("click",()=>{ if(curWeek<11){curWeek++; renderAll();} });
+
+// ----- Éditeur de créneau -----
+let editing={aid:null,d:null};
+function openEditor(aid,d){
+  editing={aid,d};
+  const a=AGENTS.find(x=>x.id===aid);
+  const o=data[curWeek][aid][d];
+  $("mWho").textContent=a.nom+" — "+a.regime;
+  $("mWhen").textContent=DAYS[d]+" "+weekDatesFor(curWeek)[d]+" · S"+(curWeek+1);
+  $("mType").value = o ? o.type : "work";
+  $("mStart").value = o&&o.start ? o.start : "07:00";
+  $("mEnd").value = o&&o.end ? o.end : "15:00";
+  $("mPause").value = o&&o.pause!=null ? o.pause : 1;
+  syncTypeUI(); recalcModal();
+  $("overlay").classList.add("show");
+}
+function closeEditor(){ $("overlay").classList.remove("show"); }
+function syncTypeUI(){
+  const timed=TIMED.has($("mType").value);
+  $("timeBlock").style.display = timed ? "block":"none";
+  const hints={
+    work:"Poste standard. Le total alimente le compteur hebdomadaire.",
+    work2:"Poste spécifique (marché, astreinte…). Compté comme travaillé.",
+    rest:"Jour de repos. N'entre pas dans le total d'heures.",
+    ca:"Congé annuel. N'acquiert pas de JRTT (accord art. 1-4).",
+    form:"Formation. Présence assimilée, hors décompte d'heures ici.",
+    jrtt:"Jour de RTT (régimes 37h et forfait).",
+  };
+  $("mHint").textContent=hints[$("mType").value]||"";
+}
+function recalcModal(){
+  if(!TIMED.has($("mType").value)){ $("mTotal").value="—"; return; }
+  const o={type:$("mType").value,start:$("mStart").value,end:$("mEnd").value,pause:Number($("mPause").value)||0};
+  const h=slotHours(o);
+  $("mTotal").value = h>0 ? fmt(h)+" h" : "—";
+}
+$("mType").addEventListener("change",()=>{syncTypeUI();recalcModal();});
+["mStart","mEnd","mPause"].forEach(id=>$(id).addEventListener("input",recalcModal));
+$("mCancel").addEventListener("click",closeEditor);
+$("overlay").addEventListener("click",e=>{ if(e.target===$("overlay")) closeEditor(); });
+$("mClear").addEventListener("click",()=>{
+  data[curWeek][editing.aid][editing.d]=null; closeEditor(); renderAll();
+});
+$("mSave").addEventListener("click",()=>{
+  const type=$("mType").value;
+  let o={type};
+  if(TIMED.has(type)){ o.start=$("mStart").value; o.end=$("mEnd").value; o.pause=Number($("mPause").value)||0; }
+  data[curWeek][editing.aid][editing.d]=o;
+  closeEditor(); renderAll();
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeEditor(); });
+
+// ----- Init -----
+renderAll();
+</script>
 </body>
 </html>
